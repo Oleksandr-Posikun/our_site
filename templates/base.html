@@ -1,0 +1,28 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    {%  include 'includes/base_path/head.html' %}
+    <title>ATZ Shop - Online Shopping Store HTML Template</title>
+</head>
+<body>
+    <!-- Start Header Section -->
+    <header>
+        {%  include 'includes/header/header_top.html' %}
+        {%  include 'includes/header/header_mdl.html' %}
+        {%  include 'includes/header/header_btm.html' %}
+    </header>
+    <!-- End Header Section -->
+
+    {% block main %}
+    {% endblock %}
+
+    <a href="#" class="scrollup" style="display: none;"><i class="ion-ios-arrow-up"></i></a>
+
+    {%  include 'includes/base_path/scripts.html' %}
+</body>
+
+</html>
+

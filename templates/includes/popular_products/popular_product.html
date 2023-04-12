@@ -1,0 +1,23 @@
+{% load static %}
+
+<div class="item">
+    <div class="product-box common-cart-box">
+        <div class="product-img common-cart-img">
+            <img src="{% static data.img %}" alt="product-img">
+            <div class="hover-option">
+                <div class="add-cart-btn">
+                    <a href="#" class="btn btn-primary">Add To Cart</a>
+                </div>
+                <ul class="hover-icon">
+                    <li><a href="#"><i class="fa fa-heart"></i></a></li>
+                    <li><a href="#test-popup3" class="quickview-popup-link {{ loop }}"><i class="fa fa-eye"></i></a></li>
+                    <li><a href="#"><i class="fa fa-refresh"></i></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="product-info common-cart-info text-center">
+            <a href="product-detail.html" class="cart-name">{{ data.product.product_name }}</a>
+            <p class="cart-price"><del>{{data.product.valuta}} {{ data.product.price }}</del>{{data.product.valuta}} {{ data.product.sale }}</p>
+        </div>
+    </div>
+</div>

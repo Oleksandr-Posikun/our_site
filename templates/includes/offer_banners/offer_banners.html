@@ -1,0 +1,12 @@
+{% load static %}
+
+<section class="offer-banners">
+    <div class="container">
+        <div class="row justify-content-center">
+            {% for item in offer_banners %}
+                {% include 'includes/offer_banners/offer_banner.html' with data=item %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
