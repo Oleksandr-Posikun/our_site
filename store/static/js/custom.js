@@ -508,7 +508,7 @@ $(window).on('load', function() {
 						`<div class="owl-item active" style="width: 82.5px; margin-right: 10px;">
 							<div class="item">
 								 <a href="#" class = "active" data-image="media/ ${responseData['images'][k]['image']}" data-zoom-image="media/ ${responseData['images'][k]['image']}">
-									 <img src="media/${responseData['images'][k]['image']}" alt=""/>
+									 <img src="media/${responseData['images'][k]}" alt=""/>
 								 </a>
 							 </div>
 						</div>`
