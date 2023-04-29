@@ -1,67 +1,28 @@
 {% load static %}
 
 <div class="header-mdl">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="hm-inner d-sm-flex align-items-center justify-content-between">
-                            <div class="header-logo">
-                                <a href="index.html"><img src="{% static 'image/logo.png' %}" alt="logo"></a>
-                            </div>
-                            <form class="header-form">
-                            <input class="search-box" placeholder="Search Product..."  required value="" type="search">
-                            <button type="submit">Search</button>
-                        </form>
-                            <div class="header-right">
-                                <div class="header-cart">
-                                <a href="#">
-                                    <div class="cart-icon">
-                                        <img src="{% static 'image/cart-icon.png' %}" alt="cart-icon">
-                                        <span>02</span>
-                                    </div>
-                                    $237.00<i class="fa fa-angle-down"></i>
-                                </a>
-                                <div class="cart-box">
-                                    <div class="cart-info">
-                                    <div class="cart-prodect d-flex">
-                                        <div class="cart-img">
-                                            <img src="{% static 'image/cart-img-1.png' %}" alt="cart-img">
-                                        </div>
-                                        <div class="cart-product">
-                                            <a href="#">Ornare sed consequat</a>
-                                            <p>$ 81.00</p>
-                                        </div>
-                                        <a href="#" class="close-icon d-flex align-items-center"><i class="ion-close"></i></a>
-                                    </div>
-                                    <div class="cart-prodect d-flex">
-                                        <div class="cart-img">
-                                            <img src="{% static 'image/cart-img-2.png' %}" alt="cart-img">
-                                        </div>
-                                        <div class="cart-product">
-                                            <a href="#">Pellentesque posuere</a>
-                                            <p>$ 80.00</p>
-                                        </div>
-                                        <a href="#" class="close-icon d-flex align-items-center"><i class="ion-close"></i></a>
-                                    </div>
-                                </div>
-                                    <div class="price-prodect d-flex align-items-center justify-content-between">
-                                    <p class="total">total</p>
-                                    <p class="total-price">$ 161.00</p>
-                                </div>
-                                    <div class="cart-btn">
-                                    <a href="cart.html" class="btn btn-primary">View Cart</a>
-                                </div>
-                                </div>
-                            </div>
-                                <div class="d-lg-none mm_icon">
-                                    <div class="form-captions" id="search">
-                                        <button type="submit" class="submit-btn-2"><i class="fa fa-search"></i></button>
-                                    </div>
-                                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i></button>
-                                </div>
-                            </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="hm-inner d-sm-flex align-items-center justify-content-between">
+                    <div class="header-logo">
+                        <a href="index.html"><img src=" {% static 'image/logo.png' %}" alt="logo"></a>
+                    </div>
+                    <form class="header-form">
+                        <input class="search-box" placeholder="Search Product..."  required value="" type="search">
+                        <button type="submit">Search</button>
+                    </form>
+                    <div class="header-right">
+                        {% include 'includes/header/cart/cart.html' %}
+                    </div>
+                    <div class="d-lg-none mm_icon">
+                        <div class="form-captions" id="search">
+                            <button type="submit" class="submit-btn-2"><i class="fa fa-search"></i></button>
                         </div>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i></button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>

@@ -4,25 +4,66 @@
 <html lang="en">
 
 <head>
-    {%  include 'includes/base_path/head.html' %}
-    <title>ATZ Shop - Online Shopping Store HTML Template</title>
+    {% include 'includes/base_part/head.html' %}
 </head>
+
 <body>
-    <!-- Start Header Section -->
+<!--    {% include 'includes/base_part/preloader.html' %}-->
+
     <header>
-        {%  include 'includes/header/header_top.html' %}
-        {%  include 'includes/header/header_mdl.html' %}
-        {%  include 'includes/header/header_btm.html' %}
+        {% include 'includes/header/header_top.html' %}
+        {% include 'includes/header/header_mdl.html' %}
+        {% include 'includes/header/header_btm.html' %}
     </header>
-    <!-- End Header Section -->
 
     {% block main %}
     {% endblock %}
 
+    <!-- Home Popup Section -->
+    <div class="modal fade bd-example-modal-lg main-popup" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body p-0">
+                    <div class="newsletter-pop-up d-flex">
+                        <div class="popup-img">
+                            <img src=" {% static 'image/1_popup-img.jpg' %}" alt="popup-img">
+                        </div>
+                        <div class="popup-form text-center">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="ion-close-round"></i></span>
+                            </button>
+                            <div class="popup-logo">
+                                <img src=" {% static 'image/logo.png' %}" alt="logo">
+                            </div>
+                            <div class="popup-text">
+                                <p>Join us Now</p>
+                                <h6>And get hot news about the theme</h6>
+                            </div>
+                            <form class="subscribe-popup-form" method="post" action="#">
+                                <input name="email" required type="email" placeholder="Enter Your Email">
+                                <button class="btn btn-primary" title="Subscribe" type="submit">Subscribe</button>
+                            </form>
+                            <div class="form-check">
+                                <label>Don't show this popup again!
+                                    <input class="defult-check" type="checkbox" checked="checked">
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Screen Load Popup Section -->
+
+    <!-- Start Quickview Popup Section -->
+    {% include 'popups/product/qwick_view.html' %}
+    <!-- End Quickview Popup Section -->
+
     <a href="#" class="scrollup" style="display: none;"><i class="ion-ios-arrow-up"></i></a>
 
-    {%  include 'includes/base_path/scripts.html' %}
+    {% include 'includes/base_part/scripts.html' %}
 </body>
 
 </html>
-

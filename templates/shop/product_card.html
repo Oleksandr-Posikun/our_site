@@ -1,0 +1,24 @@
+{%  load static %}
+
+<div class="item" data-id = "{{ data.id }}">
+    <div class="{{ class }}-box common-cart-box">
+        <div class="{{ class }}-img common-cart-img">
+
+            <img src="{%  if data.image %} {{ data.image.url }} {% else %} {% static 'no-image-ava.jpg' %} {% endif %}" alt="Saller-img">
+            <div class="hover-option">
+                <div class="add-cart-btn">
+                    <a href="{% url 'add_card' data.id %}" class="btn btn-primary"> To Cart</a>
+                </div>
+                <ul class="hover-icon">
+                    <li><a href="#"><i class="fa fa-heart"></i></a></li>
+                    <li><a href="#test-popup3" class="quickview-popup-link"><i class="fa fa-eye"></i></a></li>
+                    <li><a href="#"><i class="fa fa-refresh"></i></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="{{ class }}-info common-cart-info text-center">
+            <a href="product-detail.html" class="cart-name">{{ data.name }}</a>
+            <p class="cart-price"><del>$ {{ data.price }}</del>$ {{ data.price }}</p>
+        </div>
+    </div>
+</div>
