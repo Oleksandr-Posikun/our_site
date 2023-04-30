@@ -20,7 +20,7 @@
                             <a href="#"> {{ item.name }} </a>
                             <p>$ {{ item.price }}</p>
                         </div>
-                        <a href="{% url 'del_card' item.id %}" class="close-icon d-flex align-items-center"><i class="ion-close"></i></a>
+                        <a href="{% url 'del_card' item.id %}?next={{ request.path }}" class="close-icon d-flex align-items-center"><i class="ion-close"></i></a>
                     </div>
                 {% endfor %}
             </div>

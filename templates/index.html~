@@ -15,7 +15,7 @@
                                 <div class="slider-caption">
                                     <h1 class="animation" data-animation="fadeInDown" data-animation-delay="0.2s">SUMMER SALE</h1>
                                     <p class="animation" data-animation="fadeInUp" data-animation-delay="0.6s">Get up to 50% off your shopping items tomorrow!</p>
-                                    <a href="{% url 'shop' %}" class="btn btn-primary animation" data-animation="fadeInUp" data-animation-delay="1s">Shop Now</a>
+                                    <a href="shop.html" class="btn btn-primary animation" data-animation="fadeInUp" data-animation-delay="1s">Shop Now</a>
                                 </div>
                             </div>
                         </div>
@@ -45,7 +45,7 @@
                                 <div class="slider-caption text-center">
                                     <h1 class="animation" data-animation="fadeInDown" data-animation-delay="0.2s">SUMMER SALE</h1>
                                     <p class="animation" data-animation="fadeInUp" data-animation-delay="0.6s">Get up to 50% off your shopping items tomorrow!</p>
-                                    <a href="{% url 'shop' %}" class="btn btn-primary animation" data-animation="fadeInUp" data-animation-delay="1s">Shop Now</a>
+                                    <a href="shop.html" class="btn btn-primary animation" data-animation="fadeInUp" data-animation-delay="1s">Shop Now</a>
                                 </div>
                             </div>
                         </div>

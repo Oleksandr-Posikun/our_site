@@ -5387,6 +5387,20 @@ header.header-5 {
 .products-style-4 .common-cart-box {
 	border: 1px solid #cdcdcd;
 }
+
+.product-shop {
+	display: flex;
+	flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.product-shop img {
+	display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .products-style-4 .product-info {
 	padding: 0 10px 15px 10px;
 }

@@ -59,6 +59,19 @@ $(window).on('load', function() {
 	
 		});
 	}
+
+	document.getElementById("id_frameworks").addEventListener("change", function() {
+	document.getElementById("id_frameworks").form.submit();
+	localStorage.setItem('frameworks', document.getElementById("id_frameworks").value);
+	});
+
+	window.onload = function() {
+		var frameworks = localStorage.getItem('frameworks');
+		if (frameworks) {
+			document.getElementById("id_frameworks").value = frameworks;
+		}
+	};
+
 //Show Hide dropdown-menu Main navigation 
 	$( document ).ready( function () {
 		$( '.dropdown-menu a.dropdown-toggler' ).on( 'click', function ( e ) {
