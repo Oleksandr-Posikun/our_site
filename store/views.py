@@ -133,8 +133,6 @@ class AjaxResponse(Base):
         self.bad_request = "invalid request"
         self.__product_by_id = None
         self.cart_content = []
-        self.sums = None
-        self.count_product = None
 
     def _check_ajax_value(self, request, get: str = '', id_product=True):
         is_ajax = request.headers.get('X-Request-With') == 'XMLHttpRequest'
@@ -192,10 +190,14 @@ class AjaxResponse(Base):
         order = self._check_ajax_value(request, id_product=False)
 
         if order['sort'] != 'menu_order':
-            self.cart_content = self.all_product.order_by(order['sort'])
-            self.cart_content = serializers.serialize('json', self.cart_content)
-        else:
-            self.cart_content = self.all_product
-            self.cart_content = serializers.serialize('json', self.cart_content)
+            cart_content = self.all_product.order_by(order['sort'])
 
-        return JsonResponse({'data': self.cart_content, 'sums': self.sums, 'count_product': self.count_product})
+        else:
+            cart_content = self.all_product
+
+        cart_content = serializers.serialize('json', cart_content)
+        cart_content = json.loads(cart_content)
+        for i in cart_content:
+            print(i['fields'])
+
+        return JsonResponse({'data': cart_content, 'sums': self.sums, 'count_product': self.count_product})

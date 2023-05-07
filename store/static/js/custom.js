@@ -470,8 +470,6 @@ $(window).on('load', function() {
 			const response = data['data'];
 			const sums = data['sums']
 			const count_product = data['count_product']
-			console.log(data)
-
 			const cartMiniLogo = document.getElementsByClassName('cart-mini-box-logo');
 			let htmlInnerCartLogoSums = `
 					<div class="cart-icon">
@@ -533,8 +531,6 @@ $(window).on('load', function() {
 				const response = data['data'];
 				const sums = data['sums']
 				const count_product = data['count_product']
-				console.log(data)
-
 				const cartMiniLogo = document.getElementsByClassName('cart-mini-box-logo');
 				let htmlInnerCartLogoSums = `
 					<div class="cart-icon">
@@ -685,7 +681,6 @@ $(window).on('load', function() {
 			.then(res => res.json())
 			.then(data => {
 				const responseData = data;
-				// console.log(responseData);
 
 
 				var dataZoomImage = document.querySelectorAll('[data-zoom-image]');
@@ -920,9 +915,8 @@ $(window).on('load', function() {
 			.then(res => res.json())
 			.then(data => {
 				const response = data['data'];
-				console.log(data)
 
-			const storeCard = document.getElementsByClassName('product-box common-cart-box box');
+			const storeCard = document.getElementsByClassName('download-sort');
 			let ProductCard = ''
 
 			for (let i = 0; i < storeCard.length; i++) {
@@ -930,9 +924,9 @@ $(window).on('load', function() {
 					ProductCard +=
 					`<div class="col-md-4 col-6">
 						<div class="product-box common-cart-box box">
-							<div class="item product-shop" data-id="${response[k]['id']}">
+							<div class="item product-shop" data-id="${response[k]['fields']['id']}">
 								<div class="product-img common-cart-img">
-									<img src="media/${response[k]['image']}" alt="product-img">
+									<img src="media/${response[k]['fields']['image']}" alt="product-img">
 									<div class="hover-option">
 										<div class="add-cart-btn">
 											<a href="#" class="btn btn-primary btn-add-prod">Add To Cart</a>
@@ -945,9 +939,9 @@ $(window).on('load', function() {
 									</div>
 								</div>
 								<div class="product-info common-cart-info text-center">
-									<a href="product-detail.html" class="cart-name">${response[k]['name']}</a>
-									<p class="cart-price"><del>$ ${response[k]['price']}</del> <b>$ ${response[k]['price']}</b></p>
-									<p class="product-list-text" style="">{{ item.description }}</p>
+									<a href="product-detail.html" class="cart-name">${response[k]['fields']['name']}</a>
+									<p class="cart-price"><del>$ ${response[k]['fields']['price']}</del> <b>$ ${response[k]['fields']['price']}</b></p>
+									<p class="product-list-text" style="">${response[k]['fields']['item.description']}</p>
 									<div class="hover-option">
 										<div class="add-cart-btn">
 											<a href="#" class="btn btn-primary">Add To Cart</a>
@@ -961,7 +955,7 @@ $(window).on('load', function() {
 								</div>
 							</div>
 						</div>
-					</div>}	
+					</div>
 					`
 				}
 				storeCard[i].innerHTML = ProductCard;
