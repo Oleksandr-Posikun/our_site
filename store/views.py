@@ -197,7 +197,5 @@ class AjaxResponse(Base):
 
         cart_content = serializers.serialize('json', cart_content)
         cart_content = json.loads(cart_content)
-        for i in cart_content:
-            print(i['fields'])
 
         return JsonResponse({'data': cart_content, 'sums': self.sums, 'count_product': self.count_product})
