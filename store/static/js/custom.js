@@ -60,17 +60,23 @@ $(window).on('load', function() {
 		});
 	}
 
-	document.getElementById("id_frameworks").addEventListener("change", function() {
-	document.getElementById("id_frameworks").form.submit();
-	localStorage.setItem('frameworks', document.getElementById("id_frameworks").value);
-	});
-
 	window.onload = function() {
-		var frameworks = localStorage.getItem('frameworks');
-		if (frameworks) {
-			document.getElementById("id_frameworks").value = frameworks;
+		const idFrameworks = document.getElementById("id_frameworks");
+		if (!idFrameworks) {
+			return;
 		}
+
+		let frameworks = localStorage.getItem('frameworks');
+		if (frameworks) {
+			idFrameworks.value = frameworks;
+		}
+
+		idFrameworks.addEventListener("change", function() {
+			localStorage.setItem('frameworks', this.value);
+			this.form.submit();
+		});
 	};
+
 
 //Show Hide dropdown-menu Main navigation 
 	$( document ).ready( function () {
@@ -442,6 +448,223 @@ $(window).on('load', function() {
 		navText: ['<i class="ion-ios-arrow-back"></i>', '<i class="ion-ios-arrow-forward"></i>'],
 	});
 
+	/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+	const addProductToCart = document.querySelectorAll('.btn-add-prod')
+	addProductToCart.forEach((link) => {
+		link.addEventListener('click', function (event){
+			event.preventDefault();
+			const parent = this.closest('.item')
+			const id = parent.dataset.id;
+
+			fetch('http://127.0.0.1:8000/add_cart', {
+				method: "POST",
+				credentials: "same-origin",
+				headers:{
+					"Content-Type": "application/json",
+					"X-Request-With": "XMLHttpRequest",
+				},
+				body: JSON.stringify({id: id})
+			})
+			.then(res => res.json())
+			.then(data => {
+			const response = data['data'];
+			const sums = data['sums']
+			const count_product = data['count_product']
+			console.log(data)
+
+			const cartMiniLogo = document.getElementsByClassName('cart-mini-box-logo');
+			let htmlInnerCartLogoSums = `
+					<div class="cart-icon">
+						<img src="/static/image/cart-icon.png" alt="cart-icon">
+						<span>${count_product}</span>
+					</div>
+					$ ${sums}<i class="fa fa-angle-down"></i>
+			`
+			for (let i = 0; i < cartMiniLogo.length; i++) {
+				cartMiniLogo[i].innerHTML = htmlInnerCartLogoSums;
+			}
+
+			const cartInfo = document.getElementsByClassName('cart-info');
+			let htmlInnerCartProduct = '';
+			for (let i = 0; i < cartInfo.length; i++) {
+				for (let k = 0; k < response.length; k++) {
+					htmlInnerCartProduct +=
+						`<div class="cart-prodect d-flex item-cart" data-id="${response[k]['id']}">
+							<div class="cart-img">
+								<img src="media/${response[k]['image']}" alt="cart-img">
+							</div>
+							<div class="cart-product">
+								<a href="#"> ${response[k]['name']}</a>
+								<p>$ ${response[k]['price']}</p>
+								<p>Count x ${response[k]['count']}</p>
+							</div>
+							<button class="close-icon d-flex align-items-center btn-del-product"><i class="ion-close btn-del-product"></i></button>
+						</div>`;
+					}
+					cartInfo[i].innerHTML = htmlInnerCartProduct;
+				}
+				const PriceProdect = document.getElementsByClassName('price-prodect d-flex align-items-center justify-content-between');
+				let htmlInnerCartTotal = `<p class="total">total</p>
+										 <p class="total-price">$ ${sums}</p>;
+										`
+				for (let i = 0; i < PriceProdect.length; i++) {
+					PriceProdect[i].innerHTML = htmlInnerCartTotal;
+				}
+			});
+		})
+	})
+
+	document.addEventListener('click', function(event) {
+	if (event.target.classList.contains('btn-del-product')) {
+		event.preventDefault();
+		const parent = event.target.closest('.item-cart');
+		const id = parent.dataset.id;
+		fetch('http://127.0.0.1:8000/del_cart', {
+			method: "POST",
+			credentials: "same-origin",
+			headers: {
+				"Content-Type": "application/json",
+				"X-Request-With": "XMLHttpRequest",
+			},
+			body: JSON.stringify({id: id})
+		})
+			.then(res => res.json())
+			.then(data => {
+				const response = data['data'];
+				const sums = data['sums']
+				const count_product = data['count_product']
+				console.log(data)
+
+				const cartMiniLogo = document.getElementsByClassName('cart-mini-box-logo');
+				let htmlInnerCartLogoSums = `
+					<div class="cart-icon">
+						<img src="/static/image/cart-icon.png" alt="cart-icon">
+						<span>${count_product}</span>
+					</div>
+					$ ${sums}<i class="fa fa-angle-down"></i>
+					`
+				for (let i = 0; i < cartMiniLogo.length; i++) {
+					cartMiniLogo[i].innerHTML = htmlInnerCartLogoSums;
+				}
+
+				const cartInfo = document.getElementsByClassName('cart-info');
+				let htmlInnerCartProduct = '';
+				for (let i = 0; i < cartInfo.length; i++) {
+					for (let k = 0; k < response.length; k++) {
+						htmlInnerCartProduct +=
+							`<div class="cart-prodect d-flex item-cart" data-id="${response[k]['id']}">
+							<div class="cart-img">
+								<img src="media/${response[k]['image']}" alt="cart-img">
+							</div>
+							<div class="cart-product">
+								<a href="#"> ${response[k]['name']}</a>
+								<p>$ ${response[k]['price']}</p>
+								<p>Count x ${response[k]['count']}</p>
+							</div>
+							<button class="close-icon d-flex align-items-center btn-del-product"><i class="ion-close btn-del-product"></i></button>
+						</div>`;
+					}
+					cartInfo[i].innerHTML = htmlInnerCartProduct;
+				}
+				const PriceProdect = document.getElementsByClassName('price-prodect d-flex align-items-center justify-content-between');
+				let htmlInnerCartTotal = `<p class="total">total</p>
+										 <p class="total-price">$ ${sums}</p>;
+										`
+				for (let i = 0; i < PriceProdect.length; i++) {
+					PriceProdect[i].innerHTML = htmlInnerCartTotal;
+				}
+			});
+		}
+	});
+
+	document.addEventListener('DOMContentLoaded', function() {
+		fetch('http://127.0.0.1:8000/mini_cart', {
+			method: "POST",
+			credentials: "same-origin",
+			headers:{
+				"Content-Type": "application/json",
+				"X-Request-With": "XMLHttpRequest",
+			},
+		})
+		.then(res => res.json())
+		.then(data => {
+			const response = data['data'];
+			const sums = data['sums']
+			const count_product = data['count_product']
+
+			const cartMiniLogo = document.getElementsByClassName('cart-mini-box-logo');
+			let htmlInnerCartLogoSums = `
+					<div class="cart-icon">
+						<img src="/static/image/cart-icon.png" alt="cart-icon">
+						<span>${count_product}</span>
+					</div>
+					$ ${sums}<i class="fa fa-angle-down"></i>
+			`
+			for (let i = 0; i < cartMiniLogo.length; i++) {
+				cartMiniLogo[i].innerHTML = htmlInnerCartLogoSums;
+			}
+
+			const cartInfo = document.getElementsByClassName('cart-info');
+			let htmlInnerCartProduct = '';
+			for (let i = 0; i < cartInfo.length; i++) {
+				for (let k = 0; k < response.length; k++) {
+					htmlInnerCartProduct +=
+						`<div class="cart-prodect d-flex item-cart" data-id="${response[k]['id']}">
+							<div class="cart-img">
+								<img src="media/${response[k]['image']}" alt="cart-img">
+							</div>
+							<div class="cart-product">
+								<a href="#"> ${response[k]['name']}</a>
+								<p>$ ${response[k]['price']}</p>
+								<p>Count x ${response[k]['count']}</p>
+							</div>
+							<button class="close-icon d-flex align-items-center btn-del-product"><i class="ion-close btn-del-product"></i></button>
+						</div>`;
+				}
+				cartInfo[i].innerHTML = htmlInnerCartProduct;
+			}
+			const PriceProdect = document.getElementsByClassName('price-prodect d-flex align-items-center justify-content-between');
+			let htmlInnerCartTotal = `<p class="total">total</p>
+									 <p class="total-price">$ ${sums}</p>;
+									`
+			for (let i = 0; i < PriceProdect.length; i++) {
+				PriceProdect[i].innerHTML = htmlInnerCartTotal;
+			}
+		});
+	});
+
+	const plusButton = document.querySelector(".plus");
+	const minusButton = document.querySelector(".minus");
+	const quantityNumber = document.getElementById("number-count");
+	plusButton.addEventListener("click", incrementValue);
+	minusButton.addEventListener("click", decrementValue);
+	quantityNumber.addEventListener("change", updateValue);
+
+	function incrementValue() {
+	  let currentValue = parseInt(quantityNumber.value);
+	  if (currentValue < 10) {
+		currentValue += 1;
+		quantityNumber.value = currentValue;
+	  }
+	}
+
+	function decrementValue() {
+	  let currentValue = parseInt(quantityNumber.value);
+	  if (currentValue > 1) {
+		currentValue -= 1;
+		quantityNumber.value = currentValue;
+	  }
+	}
+
+	function updateValue() {
+	  let newValue = parseInt(quantityNumber.value);
+	  if (newValue >= 1 && newValue <= 10) {
+		quantityNumber.value = newValue;
+	  } else {
+		quantityNumber.value = quantityNumber.defaultValue;
+	  }
+	}
+
 
 	const quickviewPopupLinks = document.querySelectorAll('.quickview-popup-link')
 	quickviewPopupLinks.forEach((link) => {
@@ -508,9 +731,9 @@ $(window).on('load', function() {
 					}
 				}
 
-				const btnBtnPrimary = document.getElementsByClassName("btn btn-primary");
-				for (let i = 0; i < btnBtnPrimary.length; i++) {
-				  btnBtnPrimary[i].href = 'http://127.0.0.1:8000/add_card/' + responseData['id'];
+				const itemDataId = document.getElementsByClassName("quickview-cart-btn");
+				for (let i = 0; i < itemDataId.length; i++) {
+				  itemDataId[i].dataset.id = responseData['id'] ;
 				}
 
 				const imageGallery = document.getElementsByClassName("product_gallery_item owl-thumbs-slider owl-carousel owl-theme")
@@ -519,14 +742,13 @@ $(window).on('load', function() {
 					for (let k = 0; k < responseData['images'].length; k++){
 						textHtml +=
 						`<div class="owl-item active" style="width: 82.5px; margin-right: 10px;">
-							<div class="item">
+							<div class="item gallery">
 								 <a href="#" class = "active" data-image="media/ ${responseData['images'][k]['image']}" data-zoom-image="media/ ${responseData['images'][k]['image']}">
 									 <img src="media/${responseData['images'][k]}" alt=""/>
 								 </a>
 							 </div>
 						</div>`
 					}
-
 					imageGallery[i].innerHTML = textHtml;
 				}
 
@@ -538,7 +760,7 @@ $(window).on('load', function() {
 				zoomActive = !zoomActive;
 				if(zoomActive) {
 					if ($(window).width() >= 768) {
-					var firstImgHeight = $(".row ").height();
+					var firstImgHeight = $(".quickview-product-detail ").height();
 					var divWidth = $(".quickview-product-detail ").width();
 					$(".product_img ").elevateZoom({
 							cursor: "crosshair",
@@ -616,21 +838,174 @@ $(window).on('load', function() {
 	});
 
 
+	const addProductToCartCount = document.querySelectorAll('.btn-add-prod-count')
+	addProductToCartCount.forEach((link) => {
+		link.addEventListener('click', function (event){
+			event.preventDefault();
+			const parent = this.closest('.item')
+			const id = parent.dataset.id;
+
+			fetch('http://127.0.0.1:8000/add_cart/' + quantityNumber.value , {
+				method: "POST",
+				credentials: "same-origin",
+				headers:{
+					"Content-Type": "application/json",
+					"X-Request-With": "XMLHttpRequest",
+				},
+				body: JSON.stringify({id: id})
+			})
+			.then(res => res.json())
+			.then(data => {
+			const response = data['data'];
+			const sums = data['sums']
+			const count_product = data['count_product']
+
+			const cartMiniLogo = document.getElementsByClassName('cart-mini-box-logo');
+			let htmlInnerCartLogoSums = `
+					<div class="cart-icon">
+						<img src="/static/image/cart-icon.png" alt="cart-icon">
+						<span>${count_product}</span>
+					</div>
+					$ ${sums}<i class="fa fa-angle-down"></i>
+			`
+			for (let i = 0; i < cartMiniLogo.length; i++) {
+				cartMiniLogo[i].innerHTML = htmlInnerCartLogoSums;
+			}
+
+			const cartInfo = document.getElementsByClassName('cart-info');
+			let htmlInnerCartProduct = '';
+			for (let i = 0; i < cartInfo.length; i++) {
+				for (let k = 0; k < response.length; k++) {
+					htmlInnerCartProduct +=
+						`<div class="cart-prodect d-flex item-cart" data-id="${response[k]['id']}">
+							<div class="cart-img">
+								<img src="media/${response[k]['image']}" alt="cart-img">
+							</div>
+							<div class="cart-product">
+								<a href="#"> ${response[k]['name']}</a>
+								<p>$ ${response[k]['price']}</p>
+								<p>Count x ${response[k]['count']}</p>
+							</div>
+							<button class="close-icon d-flex align-items-center btn-del-product"><i class="ion-close btn-del-product"></i></button>
+						</div>`;
+					}
+					cartInfo[i].innerHTML = htmlInnerCartProduct;
+				}
+				const PriceProdect = document.getElementsByClassName('price-prodect d-flex align-items-center justify-content-between');
+				let htmlInnerCartTotal = `<p class="total">total</p>
+										 <p class="total-price">$ ${sums}</p>;
+										`
+				for (let i = 0; i < PriceProdect.length; i++) {
+					PriceProdect[i].innerHTML = htmlInnerCartTotal;
+				}
+			});
+		})
+	})
+	let sortingSelect = document.querySelectorAll('.sorting-items');
+
+	sortingSelect.forEach((link) => {
+		link.addEventListener('click', function (event){
+			event.preventDefault();
+			let selectedValue = link.value;
+
+			fetch('http://127.0.0.1:8000/sort', {
+				method: "POST",
+				credentials: "same-origin",
+				headers:{
+					"Content-Type": "application/json",
+					"X-Request-With": "XMLHttpRequest",
+				},
+				body: JSON.stringify({ sort: selectedValue })
+			})
+			.then(res => res.json())
+			.then(data => {
+				const response = data['data'];
+				console.log(data)
+
+			const storeCard = document.getElementsByClassName('product-box common-cart-box box');
+			let ProductCard = ''
+
+			for (let i = 0; i < storeCard.length; i++) {
+				for (let k = 0; k < response.length; k++) {
+					ProductCard +=
+					`<div class="col-md-4 col-6">
+						<div class="product-box common-cart-box box">
+							<div class="item product-shop" data-id="${response[k]['id']}">
+								<div class="product-img common-cart-img">
+									<img src="media/${response[k]['image']}" alt="product-img">
+									<div class="hover-option">
+										<div class="add-cart-btn">
+											<a href="#" class="btn btn-primary btn-add-prod">Add To Cart</a>
+										</div>
+										<ul class="hover-icon">
+											<li><a href="#"><i class="fa fa-heart"></i></a></li>
+											<li><a href="#test-popup3" class="quickview-popup-link"><i class="fa fa-eye"></i></a></li>
+											<li><a href="#"><i class="fa fa-refresh"></i></a></li>
+										</ul>
+									</div>
+								</div>
+								<div class="product-info common-cart-info text-center">
+									<a href="product-detail.html" class="cart-name">${response[k]['name']}</a>
+									<p class="cart-price"><del>$ ${response[k]['price']}</del> <b>$ ${response[k]['price']}</b></p>
+									<p class="product-list-text" style="">{{ item.description }}</p>
+									<div class="hover-option">
+										<div class="add-cart-btn">
+											<a href="#" class="btn btn-primary">Add To Cart</a>
+										</div>
+										<ul class="hover-icon">
+											<li><a href="#"><i class="fa fa-heart"></i></a></li>
+											<li><a href="#test-popup3" class="quickview-popup-link"><i class="fa fa-eye"></i></a></li>
+											<li><a href="#"><i class="fa fa-refresh"></i></a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>}	
+					`
+				}
+				storeCard[i].innerHTML = ProductCard;
+			}
+
+			})
+		})
+	});
+
 
 /*===================================*
 10. PRICE FILTER JS
 *===================================*/
- 
+
+	let minPrice = 99999999;
+	let maxPrice = 0;
+	let sums;
+	const cartPrice = document.querySelectorAll('.cart-price b')
+	for (let i = 0; i < cartPrice.length; i++) {
+		sums = parseFloat(cartPrice[i].textContent.replace(/[^\d.]/g, ''))
+		if (sums > maxPrice) {
+			maxPrice = sums
+		}
+	}
+
+	for (let k = 0; k < cartPrice.length; k++) {
+		sums = parseFloat(cartPrice[k].textContent.replace(/[^\d.]/g, ''))
+		if (minPrice > sums) {
+			minPrice = sums
+		}
+	}
+
+
 	$( "#slider-range" ).slider({
 		range: true,
-		min: 10,
-		max: 500,
-		values: [ 10, 500 ],
+		min: minPrice,
+		max: maxPrice,
+		values: [ minPrice, maxPrice ],
 		slide: function( event, ui ) {
 		$( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
 		}
 	});
-	$( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) + " - $" + $( "#slider-range" ).slider( "values", 1 ) );  
+	$( "#amount" ).val( "$ " + $( "#slider-range" ).slider( "values", 0 ) + " - $ " + $( "#slider-range" ).slider( "values", 1 ) );
+
 
 /*===================================*
 11. SELECT2 JS
@@ -719,6 +1094,8 @@ $(window).on('load', function() {
 		$('[data-method="'+$value+'"]').slideDown();
 		
 	})
+
+
 	
 /*===================================*
 16. CONTACT FORM JS

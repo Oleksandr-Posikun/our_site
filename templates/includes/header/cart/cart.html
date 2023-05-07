@@ -2,31 +2,20 @@
 
 
 <div class="header-cart">
-        <a href="#">
+        <a href="#" class="cart-mini-box-logo">
             <div class="cart-icon">
                 <img src=" {% static 'image/cart-icon.png' %} " alt="cart-icon">
                 <span>{{ user_card|length }}</span>
             </div>
-            $ {{ cart_sums }}<i class="fa fa-angle-down"></i>
+            $ <i class="fa fa-angle-down"></i>
         </a>
         <div class="cart-box">
-            <div class="cart-info">
-                {% for item in user_card %}
-                    <div class="cart-prodect d-flex">
-                        <div class="cart-img">
-                            <img src="media/{{ item.image }} " alt="cart-img">
-                        </div>
-                        <div class="cart-product">
-                            <a href="#"> {{ item.name }} </a>
-                            <p>$ {{ item.price }}</p>
-                        </div>
-                        <a href="{% url 'del_card' item.id %}?next={{ request.path }}" class="close-icon d-flex align-items-center"><i class="ion-close"></i></a>
-                    </div>
-                {% endfor %}
+            <div class="cart-info" id="parent" >
+
             </div>
         <div class="price-prodect d-flex align-items-center justify-content-between">
             <p class="total">total</p>
-            <p class="total-price">$ {{ cart_sums }}</p>
+            <p class="total-price">$ </p>
         </div>
         <div class="cart-btn">
             <a href="cart.html" class="btn btn-primary">View Cart</a>

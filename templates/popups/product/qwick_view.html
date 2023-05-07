@@ -17,15 +17,15 @@
                 <h3 class="box-price"><del>$ 95.00</del>$ 81.00</h3>
                 <p class="box-text">There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.</p>
                 <p class="stock">Availability: <span>In Stock</span></p>
-                <div class="quantity-box">
+                <div class="quantity-box" >
                     <p>Quantity:</p>
                     <div class="input-group">
                         <input type="button" value="-" class="minus">
-                        <input class="quantity-number qty" type="text" value="1" min="1" max="10">
+                        <input id="number-count" class="quantity-number qty" type="text" value="1" min="1" max="10">
                         <input type="button" value="+" class="plus">
                     </div>
-                    <div class="quickview-cart-btn">
-                        <a href="#" class="btn btn-primary"><img src=" {% static 'image/cart-icon-1.png' %}" alt="cart-icon-1"> Add To Cart</a>
+                    <div class="quickview-cart-btn item">
+                        <a href="#" class="btn btn-primary btn-add-prod-count"><img src=" {% static 'image/cart-icon-1.png' %}" alt="cart-icon-1"> Add To Cart</a>
                     </div>
                 </div>
                 <div class="box-social-like d-sm-flex justify-content-between">

@@ -1,110 +1,201 @@
 import json
 
-from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
+from django.core import serializers
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, redirect
-from store.sorted import UserSort
+from django.shortcuts import render
 from store.models import Category, Product
 
 
 class Base:
-    sorted_form = UserSort()
-    option = None
-    user_card = []
-    cart_sums = []
-
     def __init__(self):
+        self.page = None
         self.product = Product.objects
-        self.add_card = "add_card"  # check url for append product in card
-        self.del_card = "del_card"  # check url for remove product from card
+        self.category = Category.objects
+        self.all_product = self.product.all()
+        self.all_category = self.category.all()
+        self.context = {}
 
-    def card(self, request, id_product):
-        todo_request = str(request)
-        product = self.product.filter(id=id_product).values().first()
-        next_url = request.GET.get('next', '/')
+    def _filter_product(self, **kwargs):
+        temp_dict = {}
+        for key, value in kwargs.items():
+            temp_dict[key] = self.product.filter(**{key: value})
 
-        if self.del_card in todo_request:
-            self.cart_sums.remove(product['price'])
-            self.user_card.remove(product)
+        return temp_dict
 
-            return redirect(next_url)
+    def _update_context(self, update_dict: dict):
+        for key, value in update_dict.items():
+            self.context[key] = value
 
-        elif self.add_card in todo_request:
-            self.user_card.append(product)
-            self.cart_sums.append(product['price'])
+        return True
 
-            return redirect(next_url)
-
-
-class Home(Base):
-    def __init__(self):
-        super().__init__()
-
-    @csrf_exempt
-    def ajax_response(self, request):
-        is_ajax = request.headers.get('X-Request-With') == 'XMLHttpRequest'
-
-        if not is_ajax:
-            return HttpResponseBadRequest("invalid request")
-
-        data = json.load(request)
-        product_id = data.get('id')
-        product = self.product.filter(id=product_id)
-        product_list = product.values().first()
-        product_list['images'] = self.add_gallery(product[0])
-
-        return JsonResponse(product_list)
-
-    def add_gallery(self, product):
+    def _add_gallery(self, product):
         gallery = []
         product_images = list(product.images.all().values())
-
         for item in product_images:
             gallery.append(item['image'])
 
         return gallery
 
+    def get_lens_category(self):
+        temp_list = []
+
+        for i in range(len(self.all_category)):
+            len_product_dict = {'name': str(self.all_category[i]),
+                                'count': int(Product.objects.filter(category_id=i + 1).count())}
+            temp_list.append(len_product_dict)
+
+        return temp_list
+
+
+class Home(Base):
+    def __init__(self):
+        super().__init__()
+        self.page = 'index.html'
+        self.context = {'products': self.all_product, }
+        self.__set_update_list_context = self._filter_product(popular=True, bestseller=True)
+        self._update_context(self.__set_update_list_context)
+
     def index(self, request):
-        products = self.product.all()
-        popular = self.product.filter(popular=True)
-        bestseller = self.product.filter(bestseller=True)
-
-        return render(request,
-                      'index.html',
-                      {
-                          'products': products,
-                          'popular': popular,
-                          'bestseller': bestseller,
-                          'user_card': self.user_card,
-                          'cart_sums': sum(self.cart_sums)
-                      }
-                      )
+        return render(request, self.page, context=self.context)
 
 
-class Shop(Base):
+class Store(Base):
+
+    def __init__(self):
+        super().__init__()
+        self.page = 'shop.html'
+        self.context = {'products': self.all_product, 'category': self.get_lens_category()}
+        self.__set_update_list_context = self._filter_product(popular=True)
+        self._update_context(self.__set_update_list_context)
+
+    def shop(self, request):
+
+        return render(request, self.page, context=self.context)
+
+
+class Cart(Base):
+    count_sums = []
+
     def __init__(self):
         super().__init__()
 
-    def shop(self, request):
-        popular = self.product.filter(popular=True)
-        user_sort = UserSort(request.POST or None, initial={'frameworks': request.session.get('frameworks')})
+    @staticmethod
+    def availability_in_cart(cart: list, product: dict):
+        for i in cart:
+            if i['id'] == product['id']:
+                return i['id']
 
-        if user_sort.is_valid():
-            option = user_sort.cleaned_data['frameworks']
-            products = self.product.all().order_by(option)
-            request.session['frameworks'] = option
-        elif self.option is not None:
-            products = self.product.all().order_by(self.option)
+        return False
+
+    @staticmethod
+    def set_count_product(cart: list, product_id, count, subtraction=False,  price=0):
+        if subtraction:
+            for i in cart:
+                if i['id'] == product_id:
+                    i['count'] -= count
+                    i['price'] -= price
+                    if i['count'] == 0:
+                        cart.remove(i)
+
+                    return cart
+
+        for i in cart:
+            if i['id'] == product_id:
+                i['count'] += count
+                i['price'] += (price * count)
+
+        return cart
+
+    @staticmethod
+    def get_all_count(cart: list):
+        count = 0
+        for i in cart:
+            count += i['count']
+
+        return count
+
+    def sums_cart(self, obg: list):
+        self.count_sums = 0
+        for item in obg:
+            self.count_sums += int(item['price'])
+
+        return self.count_sums
+
+
+class AjaxResponse(Base):
+    cart = Cart()
+    sums = 0
+    count_product = 0
+
+    def __init__(self):
+        super().__init__()
+        self.bad_request = "invalid request"
+        self.__product_by_id = None
+        self.cart_content = []
+        self.sums = None
+        self.count_product = None
+
+    def _check_ajax_value(self, request, get: str = '', id_product=True):
+        is_ajax = request.headers.get('X-Request-With') == 'XMLHttpRequest'
+
+        if not is_ajax:
+            return HttpResponseBadRequest(self.bad_request)
+
+        data = json.load(request)
+        if id_product:
+            product_id = data.get(get)
+            return product_id
+
+        return data
+
+    def create_content(self, request, get: str = ''):
+        product_id = self._check_ajax_value(request, get)
+        self.__product_by_id = self._filter_product(id=product_id)
+        product_list = self.__product_by_id[get].values().first()
+
+        return product_list
+
+    @csrf_exempt
+    def ajax_quickview_popup(self, request):
+        content = self.create_content(request, 'id')
+        content['images'] = self._add_gallery(self.__product_by_id['id'][0])
+
+        return JsonResponse(content)
+
+    @csrf_exempt
+    def ajax_mini_cart(self, request, count=1):
+        if "mini_cart" not in str(request):
+            cart_content = self.create_content(request, 'id')
+            cart_content['count'] = count
+            result = self.cart.availability_in_cart(self.cart_content, cart_content)
+
+            if "add_cart" in str(request):
+                if result:
+                    self.cart_content = self.cart.set_count_product(self.cart_content, result, count,
+                                                                    price=cart_content['price'])
+                elif not result:
+                    cart_content['price'] = cart_content['price'] * count
+                    self.cart_content.append(cart_content)
+
+            elif "del_cart" in str(request):
+                self.cart_content = self.cart.set_count_product(self.cart_content, result, count,
+                                                                subtraction=True,
+                                                                price=cart_content['price'])
+
+        self.sums = self.cart.sums_cart(self.cart_content)
+        self.count_product = self.cart.get_all_count(self.cart_content)
+        return JsonResponse({'data': self.cart_content, 'sums': self.sums, 'count_product': self.count_product})
+
+    @csrf_exempt
+    def ajax_sort(self, request):
+        order = self._check_ajax_value(request, id_product=False)
+
+        if order['sort'] != 'menu_order':
+            self.cart_content = self.all_product.order_by(order['sort'])
+            self.cart_content = serializers.serialize('json', self.cart_content)
         else:
-            products = self.product.all()
+            self.cart_content = self.all_product
+            self.cart_content = serializers.serialize('json', self.cart_content)
 
-        return render(request,
-                      'shop.html',
-                      {
-                          'products': products,
-                          'populars': popular,
-                          'user_card': self.user_card,
-                          'cart_sums': sum(self.cart_sums),
-                          'sort': self.sorted_form
-                      }
-                      )
+        return JsonResponse({'data': self.cart_content, 'sums': self.sums, 'count_product': self.count_product})

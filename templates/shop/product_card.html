@@ -7,7 +7,7 @@
             <img src="{%  if data.image %} {{ data.image.url }} {% else %} {% static 'no-image-ava.jpg' %} {% endif %}" alt="Saller-img">
             <div class="hover-option">
                 <div class="add-cart-btn">
-                    <a href="{% url 'add_card' item.id %}?next={{ request.path }}" class="btn btn-primary"> To Cart</a>
+                    <button class="btn btn-primary btn-add-prod"> To Cart</button>
                 </div>
                 <ul class="hover-icon">
                     <li><a href="#"><i class="fa fa-heart"></i></a></li>
