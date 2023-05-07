@@ -924,7 +924,7 @@ $(window).on('load', function() {
 					ProductCard +=
 					`<div class="col-md-4 col-6">
 						<div class="product-box common-cart-box box">
-							<div class="item product-shop" data-id="${response[k]['fields']['id']}">
+							<div class="item product-shop" data-id="${response[k]['pk']}">
 								<div class="product-img common-cart-img">
 									<img src="media/${response[k]['fields']['image']}" alt="product-img">
 									<div class="hover-option">
