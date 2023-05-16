@@ -1,0 +1,15 @@
+<tr id="parent" class="row-0">
+    <td class="row-close close-1" data-title="product-remove"><a href="#"><i class="ion-close-circled"></i></a></td>
+    <td class="row-img"><img src="{{ data.product.image.url }}" alt="cart-img"></td>
+    <td class="product-name" data-title="Product"><a href="#">{{ data.product.name }}</a></td>
+    <td class="product-price" data-title="Price"><p>$ {{ data.product.price }}</p></td>
+    <td class="product-quantity" data-title="Quantity">
+        <div class="quantity_filter">
+            <input type="button" value="-" class="minus">
+            <input class="quantity-number qty" type="text" value="{{ data.count }}" min="1" max="10">
+            <input type="button" value="+" class="plus">
+        </div>
+    </td>
+    <td class="product-total" data-title="Subprice"><p>$ 156.00</p></td>
+    <td class="item-cart row-close close-2" data-id= "{{ data.product.id }}"><button class="close-icon align-items-center btn-del-product"><i class="ion-close btn-del-product"></i></button></td>
+</tr>

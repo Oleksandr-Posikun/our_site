@@ -13,13 +13,28 @@ Version      : 1.3
     const quickviewPopupLinks = document.querySelectorAll('.quickview-popup-link')
     const addProductToCartCount = document.querySelectorAll('.btn-add-prod-count')
     const sortingSelect = document.querySelectorAll('.sorting-items');
+	const cartPrice = document.querySelectorAll('.cart-price b')
 
     let minPrice = 99999999;
 	let maxPrice = 0;
 	let sums;
-	const cartPrice = document.querySelectorAll('.cart-price b')
 
 
+
+	function setCartInfo(url) {
+		fetch(url, createAjaxParams({}))
+		.then(res => res.json())
+		.then(data => {
+			const response = data['data'];
+			const sums = data['sums']
+			const count_product = data['count_product']
+
+			updateMiniCart(response, sums, count_product)
+			updateCart(response, sums)
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', setCartInfo(URL_MINICART))
 	document.addEventListener('click', function(event) {
 	if (event.target.classList.contains('btn-del-product')) {
 		event.preventDefault();
@@ -31,95 +46,33 @@ Version      : 1.3
 				const response = data['data'];
 				const sums = data['sums']
 				const count_product = data['count_product']
-				const cartMiniLogo = document.getElementsByClassName('cart-mini-box-logo');
-				let htmlInnerCartLogoSums = `
-					<div class="cart-icon">
-						<img src="/static/image/cart-icon.png" alt="cart-icon">
-						<span>${count_product}</span>
-					</div>
-					$ ${sums}<i class="fa fa-angle-down"></i>
-					`
-				for (let i = 0; i < cartMiniLogo.length; i++) {
-					cartMiniLogo[i].innerHTML = htmlInnerCartLogoSums;
-				}
+				updateMiniCart(response, sums, count_product)
+				updateCart(response, sums)
 
-				const cartInfo = document.getElementsByClassName('cart-info');
-				let htmlInnerCartProduct = '';
-				for (let i = 0; i < cartInfo.length; i++) {
-					for (let k = 0; k < response.length; k++) {
-						htmlInnerCartProduct +=
-							`<div class="cart-prodect d-flex item-cart" data-id="${response[k]['id']}">
-							<div class="cart-img">
-								<img src="media/${response[k]['image']}" alt="cart-img">
-							</div>
-							<div class="cart-product">
-								<a href="#"> ${response[k]['name']}</a>
-								<p>$ ${response[k]['price']}</p>
-								<p>Count x ${response[k]['count']}</p>
-							</div>
-							<button class="close-icon d-flex align-items-center btn-del-product"><i class="ion-close btn-del-product"></i></button>
-						</div>`;
-					}
-					cartInfo[i].innerHTML = htmlInnerCartProduct;
-				}
-				const PriceProdect = document.getElementsByClassName('price-prodect d-flex align-items-center justify-content-between');
-				let htmlInnerCartTotal = `<p class="total">total</p>
-										 <p class="total-price">$ ${sums}</p>;
-										`
-				for (let i = 0; i < PriceProdect.length; i++) {
-					PriceProdect[i].innerHTML = htmlInnerCartTotal;
-				}
 			});
 		}
 	});
-	document.addEventListener('DOMContentLoaded', function() {
-		fetch(URL_MINICART, createAjaxParams({}))
-		.then(res => res.json())
-		.then(data => {
-			const response = data['data'];
-			const sums = data['sums']
-			const count_product = data['count_product']
+	function collectAddToCartBtn(){
+		const addProductToCart = document.querySelectorAll('.btn-add-prod')
+		addProductToCart.forEach((link) => {
+			link.addEventListener('click', function (event){
+				event.preventDefault();
+				const parent = this.closest('.item')
+				const id = parent.dataset.id;
 
-			const cartMiniLogo = document.getElementsByClassName('cart-mini-box-logo');
-			let htmlInnerCartLogoSums = `
-					<div class="cart-icon">
-						<img src="/static/image/cart-icon.png" alt="cart-icon">
-						<span>${count_product}</span>
-					</div>
-					$ ${sums}<i class="fa fa-angle-down"></i>
-			`
-			for (let i = 0; i < cartMiniLogo.length; i++) {
-				cartMiniLogo[i].innerHTML = htmlInnerCartLogoSums;
-			}
+				fetch(URL_ADDCART, createAjaxParams({id: id}))
+				.then(res => res.json())
+				.then(data => {
+					const response = data['data'];
+					const sums = data['sums']
+					const count_product = data['count_product']
 
-			const cartInfo = document.getElementsByClassName('cart-info');
-			let htmlInnerCartProduct = '';
-			for (let i = 0; i < cartInfo.length; i++) {
-				for (let k = 0; k < response.length; k++) {
-					htmlInnerCartProduct +=
-						`<div class="cart-prodect d-flex item-cart" data-id="${response[k]['id']}">
-							<div class="cart-img">
-								<img src="media/${response[k]['image']}" alt="cart-img">
-							</div>
-							<div class="cart-product">
-								<a href="#"> ${response[k]['name']}</a>
-								<p>$ ${response[k]['price']}</p>
-								<p>Count x ${response[k]['count']}</p>
-							</div>
-							<button class="close-icon d-flex align-items-center btn-del-product"><i class="ion-close btn-del-product"></i></button>
-						</div>`;
-				}
-				cartInfo[i].innerHTML = htmlInnerCartProduct;
-			}
-			const PriceProdect = document.getElementsByClassName('price-prodect d-flex align-items-center justify-content-between');
-			let htmlInnerCartTotal = `<p class="total">total</p>
-									 <p class="total-price">$ ${sums}</p>;
-									`
-			for (let i = 0; i < PriceProdect.length; i++) {
-				PriceProdect[i].innerHTML = htmlInnerCartTotal;
-			}
+					updateMiniCart(response, sums, count_product)
+					updateCart(response, sums)
+				});
+			});
 		});
-	});
+	}
 	plusButton.addEventListener("click", incrementValue);
 	minusButton.addEventListener("click", decrementValue);
 	quantityNumber.addEventListener("change", updateValue);
@@ -132,13 +85,13 @@ Version      : 1.3
 
 			fetch(URL, createAjaxParams({id: id}))
 			.then(res => res.json())
-			.then(data => {
-				const responseData = data;
+			.then(responseData => {
+				const imgPath = IMG_URL + '/' + responseData['image'];
 
 				var dataZoomImage = document.querySelectorAll('[data-zoom-image]');
 				for (var i = 0; i < dataZoomImage.length; i++) {
 
-					dataZoomImage[i].setAttribute('data-zoom-image', 'media/' + responseData['image']);
+					dataZoomImage[i].setAttribute('data-zoom-image', imgPath);
 				}
 
 				let colMd5Elements = document.getElementsByClassName("col-md-5");
@@ -151,7 +104,7 @@ Version      : 1.3
 					for (let j = 0; j < imgElements.length; j++) {
 					  	let imgElement = imgElements[j];
 
-						imgElement.src = 'media/' + responseData['image'];
+						imgElement.src = imgPath;
 
 					}
 				}
@@ -190,8 +143,8 @@ Version      : 1.3
 						textHtml +=
 						`<div class="owl-item active" style="width: 82.5px; margin-right: 10px;">
 							<div class="item gallery">
-								 <a href="#" class = "active" data-image="media/ ${responseData['images'][k]['image']}" data-zoom-image="media/ ${responseData['images'][k]['image']}">
-									 <img src="media/${responseData['images'][k]}" alt=""/>
+								 <a href="#" class = "active" data-image="${IMG_URL}/ ${responseData['images'][k]['image']}" data-zoom-image="${IMG_URL}/ ${responseData['images'][k]['image']}">
+									 <img src="${IMG_URL}/${responseData['images'][k]}" alt=""/>
 								 </a>
 							 </div>
 						</div>`
@@ -247,51 +200,16 @@ Version      : 1.3
 			fetch(`${URL_ADDCART}/${quantityNumber.value}`, createAjaxParams({id: id}))
 			.then(res => res.json())
 			.then(data => {
-			const response = data['data'];
-			const sums = data['sums']
-			const count_product = data['count_product']
+				const response = data['data'];
+				const sums = data['sums']
+				const count_product = data['count_product']
 
-			const cartMiniLogo = document.getElementsByClassName('cart-mini-box-logo');
-			let htmlInnerCartLogoSums = `
-					<div class="cart-icon">
-						<img src="/static/image/cart-icon.png" alt="cart-icon">
-						<span>${count_product}</span>
-					</div>
-					$ ${sums}<i class="fa fa-angle-down"></i>
-			`
-			for (let i = 0; i < cartMiniLogo.length; i++) {
-				cartMiniLogo[i].innerHTML = htmlInnerCartLogoSums;
-			}
-
-			const cartInfo = document.getElementsByClassName('cart-info');
-			let htmlInnerCartProduct = '';
-			for (let i = 0; i < cartInfo.length; i++) {
-				for (let k = 0; k < response.length; k++) {
-					htmlInnerCartProduct +=
-						`<div class="cart-prodect d-flex item-cart" data-id="${response[k]['id']}">
-							<div class="cart-img">
-								<img src="media/${response[k]['image']}" alt="cart-img">
-							</div>
-							<div class="cart-product">
-								<a href="#"> ${response[k]['name']}</a>
-								<p>$ ${response[k]['price']}</p>
-								<p>Count x ${response[k]['count']}</p>
-							</div>
-							<button class="close-icon d-flex align-items-center btn-del-product"><i class="ion-close btn-del-product"></i></button>
-						</div>`;
-					}
-					cartInfo[i].innerHTML = htmlInnerCartProduct;
-				}
-				const PriceProdect = document.getElementsByClassName('price-prodect d-flex align-items-center justify-content-between');
-				let htmlInnerCartTotal = `<p class="total">total</p>
-										 <p class="total-price">$ ${sums}</p>;
-										`
-				for (let i = 0; i < PriceProdect.length; i++) {
-					PriceProdect[i].innerHTML = htmlInnerCartTotal;
-				}
-			});
+				updateMiniCart(response, sums, count_product)
+				updateCart(response, sums)
+			})
 		})
 	})
+
     sortingSelect.forEach((link) => {
 		link.addEventListener('click', function (event){
 			event.preventDefault();
@@ -311,7 +229,7 @@ Version      : 1.3
 						<div class="product-box common-cart-box box">
 							<div class="item product-shop" data-id="${response[k]['pk']}">
 								<div class="product-img common-cart-img">
-									<img src="media/${response[k]['fields']['image']}" alt="product-img">
+									<img src="${IMG_URL}/${response[k]['fields']['image']}" alt="product-img">
 									<div class="hover-option">
 										<div class="add-cart-btn">
 											<a href="#" class="btn btn-primary btn-add-prod">Add To Cart</a>
@@ -365,69 +283,8 @@ Version      : 1.3
 		}
 	}
 
-    function updateText(classname, text) {
-        const getElement = document.getElementsByClassName(classname);
-            for (let i = 0; i < getElement.length; i++) {
-              getElement[i].innerText = text;
-            }
-        }
-    function collectAddToCartBtn(){
-		const addProductToCart = document.querySelectorAll('.btn-add-prod')
-	addProductToCart.forEach((link) => {
-		link.addEventListener('click', function (event){
-			event.preventDefault();
-			const parent = this.closest('.item')
-			const id = parent.dataset.id;
 
-			fetch(URL_ADDCART, createAjaxParams({id: id}))
-			.then(res => res.json())
-			.then(data => {
-			const response = data['data'];
-			const sums = data['sums']
-			const count_product = data['count_product']
 
-			const cartMiniLogo = document.getElementsByClassName('cart-mini-box-logo');
-			let htmlInnerCartLogoSums = `
-					<div class="cart-icon">
-						<img src="/static/image/cart-icon.png" alt="cart-icon">
-						<span>${count_product}</span>
-					</div>
-					$ ${sums}<i class="fa fa-angle-down"></i>
-			`
-			for (let i = 0; i < cartMiniLogo.length; i++) {
-				cartMiniLogo[i].innerHTML = htmlInnerCartLogoSums;
-			}
-
-			const cartInfo = document.getElementsByClassName('cart-info');
-			let htmlInnerCartProduct = '';
-			for (let i = 0; i < cartInfo.length; i++) {
-				for (let k = 0; k < response.length; k++) {
-					htmlInnerCartProduct +=
-						`<div class="cart-prodect d-flex item-cart" data-id="${response[k]['id']}">
-							<div class="cart-img">
-								<img src="media/${response[k]['image']}" alt="cart-img">
-							</div>
-							<div class="cart-product">
-								<a href="#"> ${response[k]['name']}</a>
-								<p>$ ${response[k]['price']}</p>
-								<p>Count x ${response[k]['count']}</p>
-							</div>
-							<button class="close-icon d-flex align-items-center btn-del-product"><i class="ion-close btn-del-product"></i></button>
-						</div>`;
-					}
-					cartInfo[i].innerHTML = htmlInnerCartProduct;
-				}
-				const PriceProdect = document.getElementsByClassName('price-prodect d-flex align-items-center justify-content-between');
-				let htmlInnerCartTotal = `<p class="total">total</p>
-										 <p class="total-price">$ ${sums}</p>;
-										`
-				for (let i = 0; i < PriceProdect.length; i++) {
-					PriceProdect[i].innerHTML = htmlInnerCartTotal;
-				}
-			});
-		})
-	})
-	}
 	function incrementValue() {
 	  let currentValue = parseInt(quantityNumber.value);
 	  if (currentValue < 10) {

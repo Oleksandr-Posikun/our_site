@@ -1,12 +1,10 @@
 import json
+import os
 
-from django.core import serializers
 from django.http import JsonResponse, HttpResponseBadRequest
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
 from django.views.generic import ListView, View
 
-from store.models import Category, Product
+from store.models import Product
 
 
 class HomePage(ListView):
@@ -16,8 +14,8 @@ class HomePage(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['popular'] = Product.objects.filter(popular=True)
-        context['bestseller'] = Product.objects.filter(bestseller=True)
+        context['popular'] = self.model.objects.filter(popular=True)
+        context['bestseller'] = self.model.objects.filter(bestseller=True)
 
         return context
 

@@ -1,9 +1,8 @@
 import json
 import uuid
 
-from django.db.models import Sum
 from django.http import HttpResponseBadRequest, JsonResponse
-from django.views import View
+from django.views.generic import ListView
 
 from cart.models import UserCart
 
@@ -11,18 +10,27 @@ from cart.models import UserCart
 # Create your views here.
 
 
-class ShopCart(View):
+class ShopCart(ListView):
+    model = UserCart
+    template_name = 'cart/index.html'
+
     def __init__(self):
         super().__init__()
-        self.model = UserCart
         self.data_cart_product = []
-        self.url_mini_cart = "cart"
+        self.url_mini_cart = "mini_cart"
         self.add_cart = 'add_cart'
         self.del_cart = "del_cart"
         self.data = None
         self.user_id = None
         self.count_product = 0
         self.total_price = 0
+
+    def get_context_data(self, *,  object_list=None,  **kwargs):
+        context = super().get_context_data(**kwargs)
+        for i in context['object_list']:
+            print('TxT' * 200, i)
+        context['user'] = self.model.objects.filter(user=self.user_id)
+        return context
 
     def post(self, request, count=1):
         is_ajax = request.headers.get('X-Request-With') == 'XMLHttpRequest'
@@ -59,7 +67,8 @@ class ShopCart(View):
                 'description': product.description,
                 'price': str(product.price),
                 'image': str(img),
-                'count': cart_item.count
+                'count': cart_item.count,
+                'sums_product': round(cart_item.count * product.price)
             })
             self.total_price += cart_item.count * product.price
             self.count_product += cart_item.count
